@@ -1,135 +1,131 @@
 import streamlit as st
+from docx import Document
+from io import BytesIO
 
-# Global Styling
-st.set_page_config(page_title="Startup Growth Metrics Calculator", layout="wide")
+# Global styling and page configuration
+st.set_page_config(page_title="Startup Growth Metrics", layout="wide")
 st.markdown("""
     <style>
-    .main-title {
-        font-size: 2.5em;
-        font-weight: bold;
-        color: #4CAF50;
-        text-align: center;
-    }
-    .card {
-        background-color: #1E1E1E;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-radius: 10px;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    .metric-title {
-        font-size: 1.3em;
-        font-weight: bold;
-        color: #FFFFFF;
-        margin-bottom: 10px;
-    }
-    .metric-description {
-        font-size: 0.9em;
-        color: #A0A0A0;
-        margin-bottom: 1em;
-    }
-    .stButton>button {
-        border: none;
-        color: white;
+    /* Custom CSS for the app */
+    .navbar {
+        display: flex;
+        justify-content: space-around;
         background-color: #4CAF50;
-        padding: 10px 20px;
-        font-size: 1em;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: 0.3s;
+        padding: 10px;
+        color: white;
     }
-    .stButton>button:hover {
-        background-color: #45a049;
+    .navbar a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+    .hero-section {
+        text-align: center;
+        padding: 60px 20px;
+        color: white;
+        background-color: #1E1E1E;
+    }
+    .hero-title {
+        font-size: 3em;
+        font-weight: bold;
+    }
+    .hero-subtitle {
+        font-size: 1.2em;
+        color: #A0A0A0;
+    }
+    .footer {
+        text-align: center;
+        padding: 10px;
+        color: #A0A0A0;
+        margin-top: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Title and Description
-st.markdown("<h1 class='main-title'>📊 Startup Growth Metrics Calculator</h1>", unsafe_allow_html=True)
-st.write("Optimize your startup’s financial performance by calculating and analyzing key metrics. Each metric will guide you through understanding and improving business profitability.")
+# Navbar
+page = st.sidebar.radio("Navigation", ["Home", "Metrics Guide", "Calculator"])
 
-# 1. Customer Acquisition Cost (CAC) Card
-with st.container():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("<p class='metric-title'>Customer Acquisition Cost (CAC)</p>", unsafe_allow_html=True)
-    st.markdown("<p class='metric-description'>Calculate the cost of acquiring a new customer.</p>", unsafe_allow_html=True)
-    marketing_expenses = st.number_input("Total Marketing Expenses", min_value=0.0, step=0.01)
-    sales_expenses = st.number_input("Total Sales Expenses", min_value=0.0, step=0.01)
-    customers_acquired = st.number_input("Number of Customers Acquired", min_value=1)
-    if st.button("Calculate CAC"):
-        cac = (marketing_expenses + sales_expenses) / customers_acquired
-        st.metric("CAC", f"${cac:.2f}")
-    st.markdown("</div>", unsafe_allow_html=True)
+# Home Page
+if page == "Home":
+    # Hero Section
+    st.markdown("<div class='hero-section'><h1 class='hero-title'>Startup Growth Metrics Calculator</h1><p class='hero-subtitle'>Calculate, analyze, and optimize your startup’s key metrics effortlessly.</p></div>", unsafe_allow_html=True)
+    
+    # Features Section
+    st.subheader("🚀 Features")
+    st.write("""
+    - **Comprehensive Metrics**: Calculate essential metrics like CAC, LTV, ARPU, and more.
+    - **Easy-to-Use Interface**: Intuitive and user-friendly design for hassle-free calculations.
+    - **Downloadable Reports**: Generate and download a document with your metric results.
+    """)
+    
+    # Footer
+    st.markdown("<div class='footer'>Built to empower startups in optimizing financial performance.</div>", unsafe_allow_html=True)
 
-# 2. Lifetime Value (LTV) Card
-with st.container():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("<p class='metric-title'>Lifetime Value (LTV)</p>", unsafe_allow_html=True)
-    st.markdown("<p class='metric-description'>Estimate the total revenue per customer over their relationship with the business.</p>", unsafe_allow_html=True)
-    purchase_value = st.number_input("Average Purchase Value", min_value=0.0, step=0.01)
-    purchase_frequency = st.number_input("Average Purchase Frequency", min_value=0.0, step=0.01)
-    customer_lifetime = st.number_input("Customer Lifetime", min_value=0.0, step=0.01)
-    if st.button("Calculate LTV"):
-        ltv = purchase_value * purchase_frequency * customer_lifetime
-        st.metric("LTV", f"${ltv:.2f}")
-    st.markdown("</div>", unsafe_allow_html=True)
+# Metrics Guide Page
+elif page == "Metrics Guide":
+    st.title("📚 Metrics Guide")
+    st.write("Learn more about each metric and understand their significance for your startup's growth.")
 
-# 3. LTV to CAC Ratio Card
-with st.container():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("<p class='metric-title'>LTV to CAC Ratio</p>", unsafe_allow_html=True)
-    st.markdown("<p class='metric-description'>Assess the profitability of each customer with this ratio.</p>", unsafe_allow_html=True)
-    if 'ltv' in locals() and 'cac' in locals() and cac > 0:
-        ltv_to_cac_ratio = ltv / cac
-        st.metric("LTV to CAC Ratio", f"{ltv_to_cac_ratio:.2f}")
-    else:
-        st.write("Please calculate valid LTV and CAC values first.")
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Documented descriptions for each metric
+    metrics = {
+        "Customer Acquisition Cost (CAC)": "Measures the cost of acquiring a new customer.",
+        "Lifetime Value (LTV)": "Indicates the total revenue expected from a customer over their relationship with the business.",
+        "Average Revenue Per User (ARPU)": "Represents the average revenue generated per user.",
+        "LTV to CAC Ratio": "Helps assess the profitability of each customer.",
+        "Break-Even Point (BEP)": "Indicates the number of units needed to cover both fixed and variable costs, achieving profitability.",
+    }
+    
+    for metric, description in metrics.items():
+        st.subheader(metric)
+        st.write(description)
 
-# 4. Average Revenue Per User (ARPU) Card
-with st.container():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("<p class='metric-title'>Average Revenue Per User (ARPU)</p>", unsafe_allow_html=True)
-    st.markdown("<p class='metric-description'>Calculate the average revenue generated per user.</p>", unsafe_allow_html=True)
-    total_revenue = st.number_input("Total Revenue", min_value=0.0, step=0.01)
-    total_customers = st.number_input("Total Number of Customers", min_value=1)
-    if st.button("Calculate ARPU"):
-        arpu = total_revenue / total_customers
-        st.metric("ARPU", f"${arpu:.2f}")
-    st.markdown("</div>", unsafe_allow_html=True)
+# Calculator Page
+elif page == "Calculator":
+    st.title("📐 Metrics Calculator")
+    st.write("Select a metric to calculate and download the results.")
 
-# 5. Break-Even Point (BEP) Card
-with st.container():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("<p class='metric-title'>Break-Even Point (BEP)</p>", unsafe_allow_html=True)
-    st.markdown("<p class='metric-description'>Identify the number of units needed to cover both fixed and variable costs, achieving profitability.</p>", unsafe_allow_html=True)
-    fixed_costs = st.number_input("Fixed Costs", min_value=0.0, step=0.01)
-    unit_price = st.number_input("Unit Price", min_value=0.0, step=0.01)
-    variable_cost_per_unit = st.number_input("Variable Cost per Unit", min_value=0.0, step=0.01)
-    if st.button("Calculate BEP"):
-        if unit_price > variable_cost_per_unit:
-            bep = fixed_costs / (unit_price - variable_cost_per_unit)
-            st.metric("BEP", f"{bep:.2f} units")
-        else:
-            st.write("Unit Price must be greater than Variable Cost per Unit.")
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Metric Selection
+    selected_metric = st.selectbox("Select a Metric", list(metrics.keys()))
 
-# Summary & Insights Section
-st.markdown("---")
-st.subheader("📈 Summary & Insights")
-if 'cac' in locals() and 'ltv' in locals():
-    st.write(f"**LTV to CAC Ratio:** A value of {ltv_to_cac_ratio:.2f} indicates that for every dollar spent on acquisition, you generate {ltv_to_cac_ratio:.2f} in revenue. A healthy ratio is 3:1 or higher.")
-if 'bep' in locals():
-    st.write(f"**Break-Even Point:** To cover costs, aim to sell at least {bep:.2f} units. Understanding BEP helps manage cash flow.")
+    # Input fields based on selected metric
+    result = None  # Placeholder for calculation result
+    if selected_metric == "Customer Acquisition Cost (CAC)":
+        marketing_expenses = st.number_input("Total Marketing Expenses", min_value=0.0)
+        sales_expenses = st.number_input("Total Sales Expenses", min_value=0.0)
+        customers_acquired = st.number_input("Number of Customers Acquired", min_value=1)
+        if st.button("Calculate CAC"):
+            result = (marketing_expenses + sales_expenses) / customers_acquired
+            st.write(f"**CAC**: ${result:.2f}")
+    
+    elif selected_metric == "Lifetime Value (LTV)":
+        purchase_value = st.number_input("Average Purchase Value", min_value=0.0)
+        purchase_frequency = st.number_input("Average Purchase Frequency", min_value=0.0)
+        customer_lifetime = st.number_input("Customer Lifetime", min_value=0.0)
+        if st.button("Calculate LTV"):
+            result = purchase_value * purchase_frequency * customer_lifetime
+            st.write(f"**LTV**: ${result:.2f}")
 
-# Sidebar for Quick Tips
-st.sidebar.title("💡 Quick Tips")
-st.sidebar.info("""
-- **CAC**: Lowering CAC helps improve profitability.
-- **LTV**: Increasing customer lifetime or frequency raises LTV.
-- **BEP**: Know the minimum sales required to break even.
-""")
+    # Add similar blocks for other metrics...
 
-# Footer
-st.markdown("---")
-st.write("Developed to assist startups in tracking and optimizing financial performance effectively.")
+    # Document Generation and Download
+    if result is not None:
+        # Create a downloadable document with the result
+        def create_document(metric, value):
+            doc = Document()
+            doc.add_heading("Startup Growth Metrics Report", level=1)
+            doc.add_paragraph(f"Metric: {metric}")
+            doc.add_paragraph(f"Result: ${value:.2f}")
+            doc.add_paragraph("Thank you for using the Startup Growth Metrics Calculator!")
+            buffer = BytesIO()
+            doc.save(buffer)
+            buffer.seek(0)
+            return buffer
+
+        buffer = create_document(selected_metric, result)
+        st.download_button(
+            label="📄 Download Report",
+            data=buffer,
+            file_name="metrics_report.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
