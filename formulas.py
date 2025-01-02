@@ -43,6 +43,15 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Define metrics globally
+metrics = {
+    "Customer Acquisition Cost (CAC)": "Measures the cost of acquiring a new customer.",
+    "Lifetime Value (LTV)": "Indicates the total revenue expected from a customer over their relationship with the business.",
+    "Average Revenue Per User (ARPU)": "Represents the average revenue generated per user.",
+    "LTV to CAC Ratio": "Helps assess the profitability of each customer.",
+    "Break-Even Point (BEP)": "Indicates the number of units needed to cover both fixed and variable costs, achieving profitability.",
+}
+
 # Navbar
 page = st.sidebar.radio("Navigation", ["Home", "Metrics Guide", "Calculator"])
 
@@ -66,15 +75,6 @@ if page == "Home":
 elif page == "Metrics Guide":
     st.title("📚 Metrics Guide")
     st.write("Learn more about each metric and understand their significance for your startup's growth.")
-
-    # Documented descriptions for each metric
-    metrics = {
-        "Customer Acquisition Cost (CAC)": "Measures the cost of acquiring a new customer.",
-        "Lifetime Value (LTV)": "Indicates the total revenue expected from a customer over their relationship with the business.",
-        "Average Revenue Per User (ARPU)": "Represents the average revenue generated per user.",
-        "LTV to CAC Ratio": "Helps assess the profitability of each customer.",
-        "Break-Even Point (BEP)": "Indicates the number of units needed to cover both fixed and variable costs, achieving profitability.",
-    }
     
     for metric, description in metrics.items():
         st.subheader(metric)
